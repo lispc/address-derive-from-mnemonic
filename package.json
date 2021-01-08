@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "bitcore-lib": "^8.24.1",
+    "bitcore-mnemonic": "^8.24.1",
+    "ethereum-hdwallet": "^0.0.26"
+  }
+}
