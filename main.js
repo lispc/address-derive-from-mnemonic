@@ -1,33 +1,33 @@
-const HDWallet = require("ethereum-hdwallet");
-var Bitcore = require("bitcore-lib");
-var Mnemonic = require("bitcore-mnemonic");
+const bip39 = require("bip39");
+const bitcoin = require("bitcoinjs-lib");
+const { bufferToHex, privateToAddress } = require("ethereumjs-util");
+const HDKey = require("hdkey");
 
 const mnemonic =
   "split logic consider degree smile field term style opera dad believe indoor item type beyond";
 
 function generateEthAddress(mnemonic) {
-  const hdwallet = HDWallet.fromMnemonic(mnemonic);
-  const address = hdwallet.derive(`m/44'/60'/0'/0/0`).getAddress();
-  const addressHex = "0x" + address.toString("hex");
-  return addressHex;
+  const hdpath = "m/44'/60'/0'/0/0";
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const hdkey = HDKey.fromMasterSeed(seed).derive(hdpath);
+  const address = bufferToHex(privateToAddress(hdkey.privateKey));
+  return address;
 }
 
-// Segwit only
 function generateBtcAddress(mnemonic) {
-  var code = new Mnemonic(mnemonic);
-  var xPrivKey = code.toHDPrivateKey();
-  var xPubKey, pubKey, address;
-  xPubKey = Bitcore.HDPublicKey(xPrivKey.derive("m/49'/0'/0'"));
-  pubKey = xPubKey.derive("m/0/0").publicKey;
-  var script = new Bitcore.Script();
-  script.add(Bitcore.Opcode.OP_0);
-  script.add(pubKey.toAddress().hashBuffer);
-  address = Bitcore.Address.payingTo(script);
-  return address.toString();
+  const hdpath = "m/49'/0'/0'/0/0";
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const hdkey = HDKey.fromMasterSeed(seed).derive(hdpath);
+  const { address } = bitcoin.payments.p2sh({
+    redeem: bitcoin.payments.p2wpkh({ pubkey: hdkey.publicKey }),
+  });
+  return address;
 }
 
 function main() {
+  // 3Mry7ysaNgZypqTN74S2M5prNCaBa7jNyS
   console.log("btc address:", generateBtcAddress(mnemonic));
+  // 0x25ec658304dd1e2a4e25b34ad6ac5169746c4684
   console.log("eth address:", generateEthAddress(mnemonic));
 }
 

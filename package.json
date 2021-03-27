@@ -1,7 +1,8 @@
 {
   "dependencies": {
-    "bitcore-lib": "^8.24.1",
-    "bitcore-mnemonic": "^8.24.1",
-    "ethereum-hdwallet": "^0.0.26"
+    "bip39": "^3.0.3",
+    "bitcoinjs-lib": "^5.2.0",
+    "ethereumjs-util": "^5.2.1",
+    "hdkey": "^2.0.1"
   }
 }
